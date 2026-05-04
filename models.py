@@ -13,7 +13,6 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(100), nullable=False)
     role = db.Column(db.String(20), default="user")
 
-    # relationships
     comments = db.relationship('Comment', backref='user', lazy=True)
 
     assigned_projects = db.relationship('Project', backref='assigned_user', lazy=True)
@@ -28,6 +27,7 @@ class Project(db.Model):
     description = db.Column(db.Text)
 
     created_by = db.Column(db.Integer)
+
     assigned_to = db.Column(db.Integer, db.ForeignKey('user.id'))
 
     deadline = db.Column(db.DateTime)
@@ -36,7 +36,7 @@ class Project(db.Model):
 
     archived = db.Column(db.Boolean, default=False)
 
-    # ✅ relationship to tasks
+    # ✅ cascade delete tasks when project deleted
     tasks = db.relationship(
         'Task',
         backref='project',
@@ -64,7 +64,7 @@ class Task(db.Model):
     frequency = db.Column(db.String(50))
     reminder_time = db.Column(db.DateTime, nullable=True)
 
-    # relationships
+    # ✅ cascade delete attachments + comments
     attachments = db.relationship(
         'Attachment',
         backref='task',
@@ -103,4 +103,8 @@ class Comment(db.Model):
     date_created = db.Column(db.DateTime, default=datetime.utcnow)
 
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    task_id = db.Column(db.Integer, db.ForeignKey('task.id'))
+
+    task_id = db.Column(
+        db.Integer,
+        db.ForeignKey('task.id', ondelete="CASCADE")
+    )
