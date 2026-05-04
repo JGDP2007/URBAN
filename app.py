@@ -10,7 +10,10 @@ app = Flask(__name__)
 
 # ---------------- CONFIG ----------------
 app.config['SECRET_KEY'] = 'secret123'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://urban_db_ucvt_user:hXgeLqeASKS5AQCvhL9MC449ZQSbVBXV@dpg-d7s63sjbc2fs738phb00-a.frankfurt-postgres.render.com/urban_db_ucvt'
+import os
+
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL') , 'sqlite:///db.sqlite'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SCHEDULER_TIMEZONE'] = 'Africa/Johannesburg'
 
 import os
