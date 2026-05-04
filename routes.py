@@ -190,7 +190,7 @@ def create_task(project_id):
         except Exception:
             due_date = datetime.strptime(due_date_raw, "%Y-%m-%d")
 
-    # ✅ PARSE REMINDER TIME (SEPARATE)
+    # ✅ PARSE REMINDER TIME
     reminder_time = None
     if reminder_raw:
         try:
@@ -207,20 +207,26 @@ def create_task(project_id):
         frequency=request.form.get("frequency"),
         due_date=due_date,
         completed=False,
-        reminder_time=reminder_time   # 🔥 FIXED
+        reminder_time=reminder_time
     )
 
     db.session.add(task)
     db.session.commit()
 
-    # ✅ SEND EMAIL
+    # ✅ GET USER (IMPORTANT FIX)
+    user = None
     if task.assigned_to:
-        user = User.query.get(task.assigned_to)
-        if user:
+        user = db.session.get(User, task.assigned_to)
+
+    # ✅ SEND EMAIL SAFELY
+    if user:
+        try:
             send_assignment_email(user, task.title, task.frequency)
+        except Exception as e:
+            print("Email failed:", e)
 
+    # ✅ REDIRECT (INSIDE FUNCTION)
     return redirect(url_for("project", id=project_id))
-
 # ---------------- COMPLETE TASK ----------------
 @app.route("/complete_task/<int:task_id>")
 @login_required
