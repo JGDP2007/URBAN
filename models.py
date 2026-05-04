@@ -16,7 +16,6 @@ class User(db.Model, UserMixin):
     # relationships
     comments = db.relationship('Comment', backref='user', lazy=True)
 
-    # ✅ NEW (for assignments)
     assigned_projects = db.relationship('Project', backref='assigned_user', lazy=True)
     assigned_tasks = db.relationship('Task', backref='assigned_user', lazy=True)
 
@@ -29,8 +28,6 @@ class Project(db.Model):
     description = db.Column(db.Text)
 
     created_by = db.Column(db.Integer)
-
-    # ✅ FIX: ADD FOREIGN KEY
     assigned_to = db.Column(db.Integer, db.ForeignKey('user.id'))
 
     deadline = db.Column(db.DateTime)
@@ -39,13 +36,22 @@ class Project(db.Model):
 
     archived = db.Column(db.Boolean, default=False)
 
+    # ✅ relationship to tasks
+    tasks = db.relationship(
+        'Task',
+        backref='project',
+        cascade="all, delete-orphan"
+    )
+
 
 # ---------------- TASK ----------------
 class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
-    # project link
-    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
+    project_id = db.Column(
+        db.Integer,
+        db.ForeignKey('project.id', ondelete="CASCADE")
+    )
 
     title = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text)
@@ -53,22 +59,34 @@ class Task(db.Model):
     due_date = db.Column(db.DateTime)
     completed = db.Column(db.Boolean, default=False)
 
-    # ✅ FIX: ADD FOREIGN KEY
     assigned_to = db.Column(db.Integer, db.ForeignKey('user.id'))
 
     frequency = db.Column(db.String(50))
     reminder_time = db.Column(db.DateTime, nullable=True)
 
     # relationships
-    attachments = db.relationship('Attachment', backref='task', lazy=True)
-    comments = db.relationship('Comment', backref='task', lazy=True)
+    attachments = db.relationship(
+        'Attachment',
+        backref='task',
+        cascade="all, delete-orphan"
+    )
+
+    comments = db.relationship(
+        'Comment',
+        backref='task',
+        cascade="all, delete-orphan"
+    )
 
 
 # ---------------- ATTACHMENT ----------------
 class Attachment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
-    task_id = db.Column(db.Integer, db.ForeignKey('task.id'))
+    task_id = db.Column(
+        db.Integer,
+        db.ForeignKey('task.id', ondelete="CASCADE"),
+        nullable=False
+    )
 
     filename = db.Column(db.String(200))
     filepath = db.Column(db.String(300))
