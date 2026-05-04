@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>URBAN</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        body { 
+            margin: 0; 
+            font-family: Arial, sans-serif; 
+            display: flex; 
+            background: #f4f7f6; 
+        }
+        
+        /* SIDEBAR */
+        .sidebar { 
+            width: 240px; 
+            background: #111; 
+            color: white; 
+            height: 100vh; 
+            position: fixed; 
+            padding-top: 20px; 
+            transition: 0.3s;
+            z-index: 1000;
+        }
+
+        .sidebar h2 { 
+            padding: 0 20px; 
+            margin-bottom: 30px; 
+            font-size: 24px; 
+        }
+
+        .sidebar a { 
+            display: flex; 
+            align-items: center; 
+            color: #ccc; 
+            padding: 15px 20px; 
+            text-decoration: none; 
+        }
+
+        .sidebar a i { 
+            margin-right: 15px; 
+            width: 20px; 
+            text-align: center; 
+        }
+
+        .sidebar a:hover { 
+            background: #222; 
+            color: white; 
+        }
+        
+        /* MAIN */
+        .main { 
+            margin-left: 240px; 
+            padding: 30px; 
+            width: calc(100% - 240px); 
+        }
+
+        /* MOBILE TOP BAR */
+        .mobile-topbar {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: #111;
+            color: white;
+            padding: 12px;
+            z-index: 1100;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .mobile-topbar button {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 22px;
+            cursor: pointer;
+        }
+
+        /* OVERLAY */
+        #overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            z-index: 999;
+        }
+
+        /* MOBILE MENU BUTTON (kept from your code) */
+        .menu-btn {
+            display: none;
+            background: #111;
+            color: white;
+            border: none;
+            padding: 10px 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+        
+        /* Task & Progress Bars */
+        .progress-bar { 
+            background: #333; 
+            height: 22px; 
+            border-radius: 11px; 
+            margin: 10px 0; 
+        }
+
+        .progress-fill { 
+            background: #22c55e; 
+            height: 100%; 
+            border-radius: 11px; 
+        }
+
+        .task-row { 
+            background: white; 
+            padding: 15px; 
+            border-radius: 10px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 10px; 
+            border: 1px solid #ddd; 
+        }
+
+        .btn-check { 
+            font-size: 40px; 
+            text-decoration: none; 
+            color: #00ff00; 
+        }
+
+        .btn-check.done { 
+            color: #22c55e; 
+        }
+
+        /* 🔥 MOBILE FIXES */
+        @media (max-width: 768px) {
+
+            body {
+                display: block;
+            }
+
+            .mobile-topbar {
+                display: flex;
+            }
+
+            .sidebar {
+                left: -240px;
+            }
+
+            .sidebar.active {
+                left: 0;
+            }
+
+            #overlay.active {
+                display: block;
+            }
+
+            .main {
+                margin-left: 0;
+                width: 100%;
+                padding: 15px;
+                margin-top: 60px;
+            }
+
+            .menu-btn {
+                display: none; /* replaced by topbar */
+            }
+
+            .task-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            button, a {
+                min-height: 44px;
+            }
+        }
+/* MOBILE GLOBAL FIXES */
+@media (max-width: 768px) {
+
+    body {
+        display: block;
+    }
+
+    .main {
+        margin-left: 0 !important;
+        width: 100% !important;
+        padding: 15px !important;
+    }
+
+    /* Sidebar */
+    .sidebar {
+        left: -240px;
+        z-index: 1000;
+    }
+
+    .sidebar.active {
+        left: 0;
+    }
+
+    /* Forms stack nicely */
+    form {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 10px;
+    }
+
+    input, select, textarea, button {
+        width: 100% !important;
+    }
+
+    /* Buttons easier to tap */
+    button, a {
+        min-height: 44px;
+    }
+}
+.mobile-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.mobile-form input,
+.mobile-form textarea,
+.mobile-form select,
+.mobile-form button {
+    flex: 1 1 100%;
+}
+
+
+.task-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.upload-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.upload-bar input,
+.upload-bar button,
+.upload-bar label {
+    flex: 1 1 100%;
+}
+
+@media (max-width: 768px) {
+
+    .task-row {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 10px;
+    }
+
+    .task-row > div {
+        width: 100%;
+    }
+}
+
+.project-card {
+    display: flex;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+@media (max-width: 768px) {
+    .project-card {
+        flex-direction: column;
+    }
+}
+
+/* Prevent overflow everywhere */
+* {
+    box-sizing: border-box;
+}
+
+/* 🔥 FINAL MOBILE POLISH */
+@media (max-width: 768px) {
+
+    h2, h3 {
+        font-size: 18px;
+    }
+
+    .project-card {
+        flex-direction: column;
+    }
+
+    .project-card > div:last-child {
+        width: 100% !important;
+    }
+
+    .task-actions a,
+    .task-actions button {
+        flex: 1;
+        text-align: center;
+    }
+
+    .upload-bar label,
+    .upload-bar button {
+        text-align: center;
+    }
+
+    input, textarea, select {
+        font-size: 16px;
+    }
+}
+    </style>
+</head>
+
+<body>
+
+    <!-- ✅ MOBILE TOP BAR -->
+    <div class="mobile-topbar">
+        <button onclick="toggleSidebar()">☰</button>
+        <span>URBAN</span>
+    </div>
+
+    <!-- ✅ OVERLAY -->
+    <div id="overlay" onclick="toggleSidebar()"></div>
+
+    <div class="sidebar">
+        <h2>URBAN</h2>
+        <a href="{{ url_for('dashboard') }}"><i class="fa-solid fa-chart-simple"></i> Dashboard</a>
+        <a href="{{ url_for('dashboard') }}"><i class="fa-solid fa-thumbtack"></i> My Projects</a>
+        <a href="{{ url_for('my_tasks') }}"><i class="fa-solid fa-thumbtack"></i> My Tasks</a>
+        <a href="{{ url_for('logout') }}" style="margin-top:50px;"><i class="fa-solid fa-square"></i> Logout</a>
+    </div>
+
+    <div class="main">
+
+        <!-- (kept your button, just hidden on mobile) -->
+        <button class="menu-btn" onclick="toggleSidebar()">☰ Menu</button>
+
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- ✅ IMPROVED SIDEBAR TOGGLE -->
+    <script>
+function toggleSidebar() {
+    document.querySelector('.sidebar').classList.toggle('active');
+    document.getElementById('overlay').classList.toggle('active');
+}
+</script>
+
+</body>
+</html>

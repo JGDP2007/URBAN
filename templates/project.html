@@ -1,0 +1,518 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+/* GLOBAL IMPROVEMENTS */
+h3 {
+    margin-bottom:10px;
+}
+
+input, textarea, select {
+    border-radius:10px;
+    padding:10px;
+    border:1px solid #d1d5db; /* light border */
+    outline:none;
+    transition: all 0.2s ease;
+    background:white;
+}
+
+button {
+    border-radius:8px;
+    padding:8px;
+    border:none;
+    cursor:pointer;
+}
+
+/* focus effect */
+input:focus, textarea:focus, select:focus {
+    border-color:#22c55e;
+    box-shadow:0 0 0 2px rgba(34,197,94,0.2);
+}
+
+button {
+    cursor:pointer;
+}
+
+/* HEADER */
+.header-box {
+    background:#000;
+    color:white;
+    padding:25px;
+    
+    /* FIX 👇 */
+    border-radius:0 0 20px 20px; /* only bottom corners */
+    margin-top:0;               /* remove gap */
+}
+
+/* TASK CARD */
+.project-card {
+    margin-bottom:20px;
+}
+
+.task-card {
+    background:#000;
+    color:white;
+    padding:20px;
+    border-radius:16px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.3);
+    transition:0.2s;
+}
+
+.task-card:hover {
+    transform:translateY(-2px);
+}
+
+/* ACTION BUTTONS */
+.task-actions a {
+    padding:6px 10px;
+    border-radius:6px;
+    color:white;
+    text-decoration:none;
+    font-size:13px;
+}
+
+/* UPLOAD BAR */
+.upload-bar {
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-top:10px;
+}
+
+.upload-bar input,
+.upload-bar button {
+    padding:8px;
+    border-radius:8px;
+}
+
+.upload-bar input[type="text"] {
+    flex:1;
+}
+
+/* ATTACHMENTS */
+.attachment-item {
+    background:#111;
+    padding:8px;
+    border-radius:8px;
+    margin-bottom:5px;
+}
+
+/* COMMENTS */
+.comment-box {
+    background:#222;
+    padding:8px;
+    border-radius:6px;
+    margin-bottom:5px;
+}
+
+/* MOBILE */
+@media (max-width:768px){
+    .upload-bar {
+        flex-direction:column;
+    }
+
+    .task-actions {
+        display:flex;
+        gap:6px;
+        flex-wrap:wrap;
+    }
+}
+</style>
+
+<!-- ================= HEADER ================= -->
+<div class="header-box">
+
+    <h2>{{ project.name }}</h2>
+
+    {% if project.assigned_user %}
+    <p style="color:#aaa;">👤 {{ project.assigned_user.name }}</p>
+    {% endif %}
+
+    {% if user.role == "admin" %}
+    <form method="POST" action="{{ url_for('update_project_assignment', project_id=project.id) }}">
+        <select name="assigned_to">
+            <option value="">Unassigned</option>
+            {% for u in users %}
+            <option value="{{ u.id }}" {% if project.assigned_to == u.id %}selected{% endif %}>
+                {{ u.name }}
+            </option>
+            {% endfor %}
+        </select>
+        <button style="background:#2563eb; color:white;">Update</button>
+    </form>
+    {% endif %}
+
+    <div style="margin-top:10px;">
+        <a href="{{ url_for('export_project_pdf', project_id=project.id) }}"
+           style="background:#22c55e; padding:8px 14px; border-radius:8px; color:white;">
+           📄 Download PDF
+        </a>
+    </div>
+
+    <div style="margin-top:15px; background:#333; border-radius:20px; height:10px;">
+        <div style="width:{{ progress }}%; background:#22c55e; height:100%;"></div>
+    </div>
+
+</div>
+
+{% if user.role == "admin" %}
+<div style="background:white; padding:20px; border-radius:16px; margin-bottom:25px; box-shadow:0 4px 10px rgba(0,0,0,0.1);">
+
+    <h3>Create Task</h3>
+
+    <form method="POST" action="{{ url_for('create_task', project_id=project.id) }}"
+          style="display:flex; flex-direction:column; gap:10px;">
+
+        <input name="title" placeholder="Task title" required>
+        <textarea name="description" placeholder="Description"></textarea>
+
+        <p style="color:gray; font-size:14px; margin:0;">Set deadline</p>
+        <input type="datetime-local" name="due_date" value="{{ now }}">
+
+        <p style="color:gray; font-size:14px; margin:0;">Reminder</p>
+        <input type="datetime-local" name="reminder_time" value="{{ now }}">
+
+        <p style="color:gray; font-size:14px; margin:0;">Frequency</p>
+        <select name="frequency">
+            <option>Once</option>
+            <option>Daily</option>
+            <option>Weekly</option>
+            <option>Monthly</option>
+        </select>
+
+        <p style="color:gray;">Assign user</p>
+        <select name="assigned_to" required>
+            {% for u in users %}
+            <option value="{{ u.id }}">{{ u.name }}</option>
+            {% endfor %}
+        </select>
+
+        <button style="background:black; color:white;">Create Task</button>
+    </form>
+</div>
+{% endif %}
+
+<h3>Active Tasks</h3>
+
+{% for task in tasks if not task.completed %}
+<div class="project-card">
+
+<div class="task-card">
+
+    <b>{{ task.title }}</b>
+
+    {% if task.assigned_user %}
+    <div style="color:#aaa;">👤 {{ task.assigned_user.name }}</div>
+    {% endif %}
+
+    <div style="background:#ff8c42; padding:5px 10px; border-radius:15px; display:inline-block; font-size:12px; margin-top:5px;">
+        {{ task.days_left }}
+    </div>
+
+    {% if user.role == "admin" %}
+    <form method="POST" action="{{ url_for('update_task_assignment', task_id=task.id) }}">
+        <select name="assigned_to">
+            <option value="">Unassigned</option>
+            {% for u in users %}
+            <option value="{{ u.id }}" {% if task.assigned_to == u.id %}selected{% endif %}>
+                {{ u.name }}
+            </option>
+            {% endfor %}
+        </select>
+        <button>Change</button>
+    </form>
+    {% endif %}
+
+    <p style="color:#bbb;">{{ task.description }}</p>
+
+    <div class="task-actions">
+        <a href="{{ url_for('complete_task', task_id=task.id) }}" style="background:#22c55e;">✓</a>
+        <a href="{{ url_for('delete_task', task_id=task.id) }}" style="background:#ef4444;">✖</a>
+        <a href="{{ url_for('export_task_pdf', task_id=task.id) }}" style="background:#6366f1;">PDF</a>
+    </div>
+
+    <h4>Comments</h4>
+    {% for comment in task.comments %}
+    <div class="comment-box">
+        <b>{{ comment.user.name }}</b> - <i>{{ comment.content }}</i>
+    </div>
+    {% endfor %}
+
+    <form method="POST" action="{{ url_for('add_comment', task_id=task.id) }}">
+        <input name="content" placeholder="Add comment">
+        <button>Post</button>
+    </form>
+
+    <!-- ================= UPLOAD ================= -->
+    <form action="{{ url_for('upload_task', task_id=task.id) }}"
+          method="POST"
+          enctype="multipart/form-data"
+          style="margin-top:10px; background:#111; padding:10px; border-radius:10px;">
+
+        <div class="upload-bar">
+
+            <input type="file" name="file" accept="image/*,application/pdf">
+            <input type="text" name="link" placeholder="Paste link">
+
+            <button type="button" onclick="openCanvas({{task.id}})">✏️ Draw</button>
+
+            <button type="button"
+                    onclick="document.getElementById('cameraInput-{{task.id}}').click()">
+                📷 Camera
+            </button>
+
+            <input type="file"
+                   id="cameraInput-{{task.id}}"
+                   accept="image/*"
+                   capture="environment"
+                   style="display:none"
+                   onchange="uploadCamera(event, {{task.id}})">
+
+            <button type="submit">Save</button>
+
+        </div>
+    </form>
+
+    <div style="margin-top:10px;">
+    {% for a in task.attachments %}
+
+        <div class="attachment-item">
+
+        {% if a.filepath %}
+        📎
+        <a href="#"
+           onclick="editImage('{{ url_for('static', filename='uploads/' + a.filename) }}', {{task.id}})">
+            {{ a.filename }}
+        </a>
+        {% endif %}
+
+        {% if a.link %}
+        🔗 <a href="{{ a.link }}" target="_blank">{{ a.link }}</a>
+        {% endif %}
+
+        <a href="{{ url_for('delete_attachment', attachment_id=a.id) }}">✖</a>
+
+        </div>
+
+    {% else %}
+        <p style="color:#666;">No attachments</p>
+    {% endfor %}
+    </div>
+
+</div>
+</div>
+{% endfor %}
+
+<h3>Completed Tasks</h3>
+
+{% for task in tasks if task.completed %}
+
+<div class="task-card" style="opacity:0.85; background:#064e3b;">
+
+    <b>✔ {{ task.title }}</b>
+
+    {% if task.assigned_user %}
+    <div style="color:#bbf7d0;">👤 {{ task.assigned_user.name }}</div>
+    {% endif %}
+
+    <p style="color:#d1fae5;">{{ task.description }}</p>
+
+    <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;">
+        
+        <button onclick="toggleAttachments({{ task.id }})"
+        style="background:#22c55e; color:white; padding:6px 10px; border-radius:6px;">
+    View Attachments
+</button>
+
+        
+    </div>
+
+    <div id="attachments-{{ task.id }}" style="display:none; margin-top:10px;">
+        {% for a in task.attachments %}
+            <div class="attachment-item">
+                {% if a.filepath %}
+                    📎 {{ a.filename }}
+                {% endif %}
+                {% if a.link %}
+                    🔗 <a href="{{ a.link }}" target="_blank">{{ a.link }}</a>
+                {% endif %}
+            </div>
+        {% else %}
+            <p style="color:#a7f3d0;">No attachments</p>
+        {% endfor %}
+    </div>
+
+</div>
+
+
+{% endfor %}
+<!-- DRAW MODAL -->
+<div id="drawModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:2000;">
+    <canvas id="drawCanvas" style="background:white; width:100%; height:80%;"></canvas>
+
+    <div style="padding:10px; text-align:center;">
+        <button onclick="saveDrawing()">Save</button>
+        <button onclick="clearCanvas()">Clear</button>
+        <button onclick="closeCanvas()">Cancel</button>
+    </div>
+</div>
+<script>
+let canvas;
+let ctx;
+let drawing = false;
+let currentTask = null;
+
+// WAIT FOR PAGE LOAD
+window.onload = function(){
+    canvas = document.getElementById("drawCanvas");
+    ctx = canvas.getContext("2d");
+
+    // ================= DRAW EVENTS =================
+
+    // MOUSE
+    canvas.addEventListener("mousedown", (e) => {
+        drawing = true;
+
+        const rect = canvas.getBoundingClientRect();
+        const x = (e.clientX - rect.left) * (canvas.width / rect.width);
+        const y = (e.clientY - rect.top) * (canvas.height / rect.height);
+
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+    });
+
+    canvas.addEventListener("mouseup", () => {
+        drawing = false;
+        ctx.beginPath();
+    });
+
+    canvas.addEventListener("mousemove", (e) => {
+        if(!drawing) return;
+
+        const rect = canvas.getBoundingClientRect();
+        const x = (e.clientX - rect.left) * (canvas.width / rect.width);
+        const y = (e.clientY - rect.top) * (canvas.height / rect.height);
+
+        ctx.lineWidth = 3;
+        ctx.lineCap = "round";
+
+        ctx.lineTo(x, y);
+        ctx.stroke();
+    });
+
+    // TOUCH (MOBILE)
+    canvas.addEventListener("touchstart", (e) => {
+        e.preventDefault();
+        drawing = true;
+
+        const rect = canvas.getBoundingClientRect();
+        const x = (e.touches[0].clientX - rect.left) * (canvas.width / rect.width);
+        const y = (e.touches[0].clientY - rect.top) * (canvas.height / rect.height);
+
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+    });
+
+    canvas.addEventListener("touchend", () => {
+        drawing = false;
+        ctx.beginPath();
+    });
+
+    canvas.addEventListener("touchmove", (e) => {
+        e.preventDefault();
+        if(!drawing) return;
+
+        const rect = canvas.getBoundingClientRect();
+        const x = (e.touches[0].clientX - rect.left) * (canvas.width / rect.width);
+        const y = (e.touches[0].clientY - rect.top) * (canvas.height / rect.height);
+
+        ctx.lineWidth = 3;
+        ctx.lineCap = "round";
+
+        ctx.lineTo(x, y);
+        ctx.stroke();
+    });
+};
+
+// ================= FUNCTIONS (MUST BE GLOBAL) =================
+
+// OPEN DRAW
+function openCanvas(id){
+    currentTask = id;
+
+    const modal = document.getElementById("drawModal");
+    modal.style.display = "block";
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight * 0.8;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.beginPath();
+}
+
+// CLOSE
+function closeCanvas(){
+    document.getElementById("drawModal").style.display = "none";
+}
+
+// CLEAR
+function clearCanvas(){
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+// SAVE
+function saveDrawing(){
+    let dataURL = canvas.toDataURL();
+
+    fetch(`/save_drawing/${currentTask}`, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({image: dataURL})
+    })
+    .then(res => res.json())
+    .then(data => {
+        location.reload();
+    });
+}
+
+// CAMERA
+function uploadCamera(event, taskId){
+    let file = event.target.files[0];
+    let formData = new FormData();
+    formData.append("file", file);
+
+    fetch(`/upload_task/${taskId}`, {
+        method: "POST",
+        body: formData
+    }).then(() => location.reload());
+}
+
+// EDIT IMAGE
+function editImage(imageUrl, taskId){
+    currentTask = taskId;
+
+    let img = new Image();
+
+    img.onload = function(){
+        document.getElementById("drawModal").style.display = "block";
+
+        canvas.width = img.width;
+        canvas.height = img.height;
+
+        ctx.drawImage(img, 0, 0);
+        ctx.beginPath();
+    }
+
+    img.src = imageUrl;
+}
+function toggleAttachments(taskId){
+    let el = document.getElementById("attachments-" + taskId);
+
+    if(el.style.display === "none"){
+        el.style.display = "block";
+    } else {
+        el.style.display = "none";
+    }
+}
+</script>
+{% endblock %}

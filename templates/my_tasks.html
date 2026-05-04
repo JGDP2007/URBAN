@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>My Tasks</h2>
+
+{% for task in tasks %}
+<div class="task-row">
+    <div>
+        <b style="font-size:18px;">{{task.title}}</b><br>
+        <span style="color:gray;">{{task.description}}</span><br>
+        <small>Due: {{task.due_date.strftime('%Y-%m-%d') if task.due_date else 'No Date'}}</small>
+    </div>
+    <div style="display:flex; align-items:center; gap:20px;">
+        {% if task.completed %}
+            <i class="fa-solid fa-circle-check" style="color:#22c55e; font-size:40px;"></i>
+            <div style="background:#ff8c42; color:white; padding:10px; border-radius:15px; font-weight:bold; opacity:0.5;">Done</div>
+        {% else %}
+            <a href="{{ url_for('complete_task', task_id=task.id) }}" class="btn-check"><i class="fa-regular fa-square-check"></i></a>
+            <div style="background:#ff8c42; color:white; padding:10px 15px; border-radius:15px; font-weight:bold;">1 Day left</div>
+        {% endif %}
+    </div>
+</div>
+{% endfor %}
+
+{% if not tasks %}<p style="color:gray;">You have no tasks.</p>{% endif %}
+
+{% endblock %}

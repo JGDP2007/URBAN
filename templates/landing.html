@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>URBAN CONSTRUCTION</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial;
+            background: #000000;
+            color: white;
+            text-align: center;
+        }
+
+        .container {
+            margin-top: 15%;
+        }
+
+        h1 {
+            font-size: 300%;
+        }
+
+        /* This controls how ALL links/buttons look */
+        a {
+            display: inline-block;
+            margin: 2%;
+            padding: 15px 30px; /* Switched to px so the buttons don't warp on different screen sizes */
+            background: #2297c5;
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        /* Made the hover state slightly darker so it feels like a real button */
+        a:hover {
+            background: #1a779b;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>URBAN CONSTRUCTION</h1>
+
+    <p>Version 0.1</p>
+
+    <a href="{{ url_for('login') }}">Login</a>
+    <a href="{{ url_for('register') }}">Register Now</a>
+
+</div>
+
+</body>
+</html>

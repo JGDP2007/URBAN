@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Archived Projects</h2>
+
+{% for p in projects %}
+<div style="background:white; padding:15px; margin-bottom:10px; border-radius:10px;">
+    <b>{{ p.name }}</b><br>
+    <small>{{ p.description }}</small><br><br>
+
+    <a href="{{ url_for('project', id=p.id) }}">
+        View Project
+    </a>
+</div>
+{% else %}
+<p>No archived projects</p>
+{% endfor %}
+
+{% endblock %}
