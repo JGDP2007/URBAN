@@ -18,9 +18,16 @@ input, textarea, select {
 
 button {
     border-radius:8px;
-    padding:8px;
+    padding:8px 12px;
     border:none;
     cursor:pointer;
+    font-weight:500;
+    transition:0.2s;
+}
+
+button:hover {
+    opacity:0.9;
+    transform:translateY(-1px);
 }
 
 /* focus effect */
@@ -37,38 +44,48 @@ button {
 .header-box {
     background:#000;
     color:white;
-    padding:25px;
-    
-    /* FIX 👇 */
-    border-radius:0 0 20px 20px; /* only bottom corners */
-    margin-top:0;               /* remove gap */
+    padding:30px 25px;
+    border-radius:0 0 20px 20px;
+    margin-top:0;
 }
 
+.header-box h2 {
+    font-size:28px;
+    font-weight:600;
+}
+
+.header-box p {
+    margin-top:5px;
+    font-size:14px;
+    color:#ccc;
+}
 /* TASK CARD */
 .project-card {
     margin-bottom:20px;
 }
 
 .task-card {
-    background:#000;
+    background:#111;
     color:white;
     padding:20px;
     border-radius:16px;
-    box-shadow:0 4px 12px rgba(0,0,0,0.3);
+    box-shadow:0 6px 16px rgba(0,0,0,0.25);
     transition:0.2s;
+    border:1px solid #1f2937;
 }
-
 .task-card:hover {
     transform:translateY(-2px);
 }
 
 /* ACTION BUTTONS */
 .task-actions a {
-    padding:6px 10px;
+    padding:6px 12px;
     border-radius:6px;
     color:white;
     text-decoration:none;
     font-size:13px;
+    font-weight:500;
+    display:inline-block;
 }
 
 /* UPLOAD BAR */
@@ -134,7 +151,7 @@ button {
             <option value="">Unassigned</option>
             {% for u in users %}
             <option value="{{ u.id }}" {% if project.assigned_to == u.id %}selected{% endif %}>
-                {{ u.name }}{{u.email}}
+                {{ u.name }} ({{ u.email }})
             </option>
             {% endfor %}
         </select>
@@ -183,7 +200,7 @@ button {
         <p style="color:gray;">Assign user</p>
         <select name="assigned_to" required>
             {% for u in users %}
-            <option value="{{ u.id }}">{{ u.name }}</option>
+            <option value="{{ u.id }}">{{ u.name }} ({{ u.email }})</option>
             {% endfor %}
         </select>
 
@@ -202,7 +219,7 @@ button {
     <b>{{ task.title }}</b>
 
     {% if task.assigned_user %}
-    <div style="color:#aaa;">👤 {{ task.assigned_user.name }} ({{ task.assigned_user.username }}) ({{ task.assigned_user.email }})</div>
+    <div style="color:#aaa;">👤 {{ task.assigned_user.name }} ({{ task.assigned_user.email }})</div>
     {% endif %}
 
     <div style="background:#ff8c42; padding:5px 10px; border-radius:15px; display:inline-block; font-size:12px; margin-top:5px;">
@@ -307,7 +324,7 @@ button {
 
 {% for task in tasks if task.completed %}
 
-<div class="task-card" style="opacity:0.85; background:#064e3b;">
+<div class="task-card"style="opacity:0.9; background:#065f46; border:1px solid #10b981;"
 
     <b>✔ {{ task.title }}</b>
 
