@@ -3,6 +3,9 @@
 <head>
     <title>Login</title>
 
+    <!-- ✅ MOBILE SUPPORT -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <style>
         body {
             margin: 0;
@@ -33,7 +36,77 @@
             background: #1e1e2f;
             color: white;
             border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
         }
+
+        /* ================= ADDED IMPROVEMENTS ================= */
+
+        /* Input styling */
+        input {
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #2297c5;
+            box-shadow: 0 0 5px rgba(34,151,197,0.3);
+        }
+
+        /* Button interaction */
+        button:hover {
+            background: #2a2a40;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        /* Title spacing */
+        h2 {
+            margin-top: 0;
+            text-align: center;
+        }
+
+        /* Link styling */
+        a {
+            color: #2297c5;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        /* Center link */
+        .card p {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        /* MOBILE FIX */
+        @media (max-width: 768px) {
+
+            body {
+                padding: 20px;
+                height: auto;
+                align-items: flex-start;
+            }
+
+            .card {
+                margin-top: 40%;
+                padding: 20px;
+            }
+
+            button {
+                min-height: 44px;
+            }
+        }
+
     </style>
 </head>
 

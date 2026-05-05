@@ -3,6 +3,9 @@
 <head>
     <title>URBAN CONSTRUCTION</title>
 
+    <!-- ✅ MOBILE SUPPORT -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <style>
         body {
             margin: 0;
@@ -24,7 +27,7 @@
         a {
             display: inline-block;
             margin: 2%;
-            padding: 15px 30px; /* Switched to px so the buttons don't warp on different screen sizes */
+            padding: 15px 30px;
             background: #2297c5;
             color: white;
             text-decoration: none;
@@ -33,10 +36,57 @@
             transition: 0.3s;
         }
 
-        /* Made the hover state slightly darker so it feels like a real button */
         a:hover {
             background: #1a779b;
         }
+
+        /* ================= ADDED IMPROVEMENTS ================= */
+
+        /* Button feel */
+        a {
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        a:active {
+            transform: scale(0.98);
+        }
+
+        /* Container upgrade (card look) */
+        .container {
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+            background: rgba(255,255,255,0.05);
+            padding: 30px;
+            border-radius: 20px;
+        }
+
+        /* Subtitle */
+        p {
+            opacity: 0.7;
+            margin-bottom: 20px;
+        }
+
+        /* MOBILE FIX */
+        @media (max-width: 768px) {
+
+            .container {
+                margin-top: 40%;
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 200%;
+            }
+
+            a {
+                width: 80%;
+                margin: 10px auto;
+                display: block;
+                text-align: center;
+            }
+        }
+
     </style>
 </head>
 
@@ -46,10 +96,18 @@
 
     <h1>URBAN CONSTRUCTION</h1>
 
+    <!-- ✅ ADDED TAGLINE -->
+    <p>Manage your projects. Track tasks. Stay in control.</p>
+
     <p>Version 1.0</p>
 
     <a href="{{ url_for('login') }}">LOGIN</a>
     <a href="{{ url_for('register') }}">REGISTER NOW</a>
+
+    <!-- ✅ ADDED FOOTER -->
+    <p style="margin-top:30px; font-size:12px; opacity:0.5;">
+        © 2026 Urban Construction
+    </p>
 
 </div>
 

@@ -2,6 +2,8 @@
 
 {% block content %}
 
+<div class="container">
+
 <h2 style="margin-bottom:0;">Dashboard</h2>
 
 <p style="color:gray;">Welcome, {{user.name}} 👋</p>
@@ -10,53 +12,48 @@
 
 {% if user.role == "admin" %}
 
-<div style="background:white; padding:20px; border-radius:10px; margin-bottom:30px; border-top: 4px solid #22c55e; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+<div class="card" style="border-top: 4px solid #22c55e;">
 
     <h3 style="margin-top:0;">Create Project</h3>
 
     <form method="POST" action="{{ url_for('create_project') }}" class="mobile-form">
 
-        <input name="name" placeholder="Project Name" required style="padding:10px; border:1px solid #ccc; border-radius:5px;">
+        <input name="name" placeholder="Project Name" required>
 
-        <textarea name="description" placeholder="Description" rows="4" style="width: 100%; border-radius: 10px; padding: 10px;"></textarea>
+        <textarea name="description" placeholder="Description" rows="4"></textarea>
 
-       <p style="color:gray; font-size:14px; margin:0;">
-Set deadline (date & time)
-</p>
+        <p style="color:gray; font-size:14px; margin:0;">
+        Set deadline (date & time)
+        </p>
 
-<input type="datetime-local" name="deadline"
-       value="{{ now }}"
-       style="padding:10px; border:1px solid #ccc; border-radius:5px;">
+        <input type="datetime-local" name="deadline" value="{{ now }}">
 
-<p style="color:gray; font-size:14px; margin:0;">
-Reminder Date & Time
-</p>
+        <p style="color:gray; font-size:14px; margin:0;">
+        Reminder Date & Time
+        </p>
 
-<input type="datetime-local" name="reminder_time"
-       value="{{ now }}"
-       style="padding:10px; border:1px solid #ccc; border-radius:5px;">
+        <input type="datetime-local" name="reminder_time" value="{{ now }}">
 
-<p style="color:gray; font-size:14px; margin:0;">
-Reminder Frequency
-</p>
+        <p style="color:gray; font-size:14px; margin:0;">
+        Reminder Frequency
+        </p>
 
-<select name="frequency"
-        style="padding:10px; border:1px solid #ccc; border-radius:5px;">
-    <option value="Once">Once</option>
-    <option value="Daily">Daily</option>
-    <option value="Weekly">Weekly</option>
-    <option value="Monthly">Monthly</option>
-</select>
+        <select name="frequency">
+            <option value="Once">Once</option>
+            <option value="Daily">Daily</option>
+            <option value="Weekly">Weekly</option>
+            <option value="Monthly">Monthly</option>
+        </select>
 
         <p style="color:gray; font-size:14px; margin:0;">Assign to:</p>
 
-        <select name="assigned_to" style="padding:10px; border:1px solid #ccc; border-radius:5px;">
-
-            {% for u in users %}<option value="{{u.id}}">{{u.name}}</option>{% endfor %}
-
+        <select name="assigned_to">
+            {% for u in users %}
+            <option value="{{u.id}}">{{u.name}}</option>
+            {% endfor %}
         </select>
 
-        <button type="submit" style="background:#22c55e; color:white; border:none; padding:10px 20px; border-radius:5px; cursor:pointer;">Create Project</button>
+        <button type="submit" class="btn btn-primary" style="background:#22c55e;">Create Project</button>
 
     </form>
 
@@ -66,7 +63,8 @@ Reminder Frequency
 
 
 
-<div style="display: flex; gap: 40px;">
+<!-- ✅ FIXED FLEX WRAP -->
+<div class="flex" style="margin-top:20px; align-items:flex-start;">
 
     <div style="flex: 1;">
 
@@ -74,60 +72,54 @@ Reminder Frequency
 
         <hr style="border:0; border-top:1px solid #ddd; margin-bottom:20px;">
 
-       
-
         {% for p in active_projects %}
 
-        <div class="project-card">
+        <div class="project-card card">
 
             <div style="background:#000; color:white; padding:20px; flex:1;">
 
                 <h3 style="margin:0;">{{p.name}}</h3>
-{% if p.assigned_user %}
-<p style="color:#aaa; font-size:13px; margin-top:5px;">
-    👤 {{ p.assigned_user.name }}
-</p>
-{% endif %}
-{% if p.description %}
-<p style="
-    color:#ccc;
-    font-size:14px;
-    margin-top:8px;
-    line-height:1.4;
 
-    word-break: break-all;
-    overflow-wrap: break-word;
-    white-space: normal;
+                {% if p.assigned_user %}
+                <p style="color:#aaa; font-size:13px; margin-top:5px;">
+                    👤 {{ p.assigned_user.name }}
+                </p>
+                {% endif %}
 
-    max-height:60px;
-    overflow:hidden;
-    display:-webkit-box;
-    -webkit-line-clamp:3;
-    -webkit-box-orient:vertical;
-">
-    {{ p.description }}
-</p>
-{% endif %}
+                {% if p.description %}
+                <p style="
+                    color:#ccc;
+                    font-size:14px;
+                    margin-top:8px;
+                    line-height:1.4;
+                    word-break: break-all;
+                    overflow-wrap: break-word;
+                    white-space: normal;
+                    max-height:60px;
+                    overflow:hidden;
+                    display:-webkit-box;
+                    -webkit-line-clamp:3;
+                    -webkit-box-orient:vertical;
+                ">
+                    {{ p.description }}
+                </p>
+                {% endif %}
 
-                <div class="progress-bar"><div class="progress-fill" style="width:{{p.progress}}%"></div></div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width:{{p.progress}}%"></div>
+                </div>
 
                 <small style="color:#aaa;">Progress bar</small>
 
-                <div style="margin-top:15px; display:flex; align-items:center; gap:10px;">
+                <div style="margin-top:15px; display:flex; flex-wrap:wrap; align-items:center; gap:10px;">
 
-                    <a href="{{ url_for('project', id=p.id) }}" style="color:#22c55e; text-decoration:none; font-weight:bold;">View Details</a>
+                    <a href="{{ url_for('project', id=p.id) }}" class="btn" style="background:#22c55e; color:white;">
+                        View Details
+                    </a>
 
-                    <!-- ✅ ADDED DELETE BUTTON -->
                     {% if user.role == "admin" %}
                     <a href="{{ url_for('delete_project', project_id=p.id) }}"
-                       style="
-                         color:white;
-                         background:#ef4444;
-                         padding:6px 12px;
-                         border-radius:6px;
-                         text-decoration:none;
-                         font-size:12px;
-                       "
+                       class="btn btn-danger"
                        onclick="return confirm('Delete this project? This cannot be undone.')">
                        Delete
                     </a>
@@ -137,42 +129,65 @@ Reminder Frequency
 
             </div>
 
-            <div style="background:#ff8c42; color:white; width:100px; display:flex; align-items:center; justify-content:center; text-align:center; font-weight:bold;">
-    {{ p.time_left }}
-</div>
+            <div style="
+                background:#ff8c42;
+                color:white;
+                min-width:100px;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                text-align:center;
+                font-weight:bold;
+                padding:10px;
+            ">
+                {{ p.time_left }}
+            </div>
 
         </div>
 
         {% endfor %}
 
-       
+        {% if not active_projects %}
+        <p style="color:gray;">No active projects.</p>
+        {% endif %}
 
-        {% if not active_projects %}<p style="color:gray;">No active projects.</p>{% endif %}
-
-    </div>
-
-
-
-<div style="display: flex; gap: 40px;">
-
-    <div style="flex: 1;">
-        <!-- Active projects -->
     </div>
 
 </div>
 
-<!-- ✅ Completed projects BELOW -->
+
+
+<!-- KEEPING YOUR ORIGINAL STRUCTURE (NOT REMOVED) -->
+<div style="display: flex; gap: 40px;">
+    <div style="flex: 1;">
+        <!-- Active projects -->
+    </div>
+</div>
+
+
+
+<!-- ✅ COMPLETED PROJECTS -->
 <div style="margin-top: 30px;">
+
     <a href="{{ url_for('archive') }}"
-   style="background:#6b7280; color:white; padding:10px 15px; border-radius:8px; text-decoration:none;">
-   📦 View Archived Projects
-</a>
-    <h3><span style="color:#22c55e;">●</span> Completed</h3>
-    
+       class="btn"
+       style="background:#6b7280; color:white;">
+       📦 View Archived Projects
+    </a>
+
+    <h3 style="margin-top:20px;">
+        <span style="color:#22c55e;">●</span> Completed
+    </h3>
 
     {% for p in completed_projects %}
     <a href="{{ url_for('project', id=p.id) }}" style="text-decoration:none;">
-        <div style="background:#22c55e; color:white; padding:20px; border-radius:40px; margin-bottom:15px; text-align:center; font-weight:bold; border:3px solid black;">
+        <div class="card" style="
+            background:#22c55e;
+            color:white;
+            text-align:center;
+            font-weight:bold;
+            border-radius:20px;
+        ">
             Project Completed: {{p.name}} (View Tasks)
         </div>
     </a>
@@ -181,6 +196,9 @@ Reminder Frequency
     {% if not completed_projects %}
         <p style="color:gray;">No completed projects.</p>
     {% endif %}
+
+</div>
+
 </div>
 
 {% endblock %}

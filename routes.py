@@ -1,4 +1,4 @@
-from flask import render_template, redirect, url_for, request, Response, send_file
+from flask import render_template,flash, redirect, url_for, request, Response, send_file
 from app import app, mail
 from models import db, User, Project, Task, Attachment, Comment
 from flask_login import login_user, login_required, logout_user, current_user
@@ -216,6 +216,8 @@ def create_task(project_id):
 
     db.session.add(task)
     db.session.commit()
+    
+    flash("Task created successfully")
 
     # ✅ GET USER
     user = None
