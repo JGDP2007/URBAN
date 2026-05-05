@@ -521,6 +521,28 @@ def delete_attachment(attachment_id):
     db.session.commit()
 
     return redirect(request.referrer)
+#---------------- DELETE USER ----------------
+@app.route("/delete_user/<int:user_id>")
+@login_required
+def delete_user(user_id):
+    user = User.query.get_or_404(user_id)
+
+    # 🔥 Remove dependencies FIRST (prevents crashes)
+
+    # delete comments
+    Comment.query.filter_by(user_id=user_id).delete()
+
+    # remove from tasks
+    Task.query.filter_by(assigned_to=user_id).update({"assigned_to": None})
+
+    # remove from projects
+    Project.query.filter_by(assigned_to=user_id).update({"assigned_to": None})
+
+    # ✅ now delete user
+    db.session.delete(user)
+    db.session.commit()
+
+    return redirect(url_for("dashboard"))
 # ---------------- LOGOUT ----------------
 @app.route("/logout")
 @login_required
