@@ -125,7 +125,7 @@ button {
     <h2>{{ project.name }}</h2>
 
     {% if project.assigned_user %}
-    <p style="color:#aaa;">👤 {{ project.assigned_user.name }}</p>
+    <p style="color:#aaa;">👤 {{ project.assigned_user.name }} ({{ project.assigned_user.email }})</p>
     {% endif %}
 
     {% if user.role == "admin" %}
@@ -134,7 +134,7 @@ button {
             <option value="">Unassigned</option>
             {% for u in users %}
             <option value="{{ u.id }}" {% if project.assigned_to == u.id %}selected{% endif %}>
-                {{ u.name }}
+                {{ u.name }}{{u.email}}
             </option>
             {% endfor %}
         </select>
@@ -202,7 +202,7 @@ button {
     <b>{{ task.title }}</b>
 
     {% if task.assigned_user %}
-    <div style="color:#aaa;">👤 {{ task.assigned_user.name }}</div>
+    <div style="color:#aaa;">👤 {{ task.assigned_user.name }} ({{ task.assigned_user.username }}) ({{ task.assigned_user.email }})</div>
     {% endif %}
 
     <div style="background:#ff8c42; padding:5px 10px; border-radius:15px; display:inline-block; font-size:12px; margin-top:5px;">
@@ -215,7 +215,7 @@ button {
             <option value="">Unassigned</option>
             {% for u in users %}
             <option value="{{ u.id }}" {% if task.assigned_to == u.id %}selected{% endif %}>
-                {{ u.name }}
+                {{ u.name }} {{u.email}}
             </option>
             {% endfor %}
         </select>
