@@ -200,5 +200,22 @@
 </div>
 
 </div>
+<script>
+function validateWeekday(input) {
+    if (!input.value) return;
 
+    let date = new Date(input.value);
+    let day = date.getDay(); // 0 = Sunday, 6 = Saturday
+
+    if (day === 0 || day === 6) {
+        alert("Only weekdays (Mon–Fri) allowed!");
+        input.value = "";
+    }
+}
+
+// Apply to all datetime inputs
+document.querySelectorAll('input[type="datetime-local"]').forEach(input => {
+    input.addEventListener("change", () => validateWeekday(input));
+});
+</script>
 {% endblock %}

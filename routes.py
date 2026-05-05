@@ -9,7 +9,8 @@ import os
 from datetime import datetime, date, timedelta
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet
-
+def is_weekday(dt):
+    return dt.weekday() < 5  # Monday=0, Sunday=6
 
 # ---------------- LANDING PAGE ----------------
 @app.route("/")
@@ -194,11 +195,20 @@ def create_task(project_id):
         except:
             due_date = datetime.strptime(due_date_raw, "%Y-%m-%d")
 
+        if not is_weekday(due_date):
+            flash("Due date must be Monday to Friday")
+            return redirect(request.referrer)
+
     # ✅ PARSE REMINDER
     reminder_time = None
     if reminder_raw:
         try:
             reminder_time = datetime.fromisoformat(reminder_raw)
+
+            if not is_weekday(reminder_time):
+                flash("Reminder must be Monday to Friday")
+                return redirect(request.referrer)
+
         except:
             reminder_time = None
 
@@ -224,14 +234,13 @@ def create_task(project_id):
     if task.assigned_to:
         user = User.query.get(task.assigned_to)
 
-    # ✅ SEND EMAIL SAFELY (won’t crash app)
+    # ✅ SEND EMAIL
     if user and user.email:
         try:
             send_assignment_email(user, task.title, task.frequency)
         except Exception as e:
             print("Email failed:", e)
 
-    # ✅ FINAL RETURN (ONLY ONE RETURN)
     return redirect(url_for("project", id=project_id))
 # ---------------- COMPLETE TASK ----------------
 @app.route("/complete_task/<int:task_id>")
@@ -256,6 +265,7 @@ def delete_task(task_id):
 
 
 # ---------------- CREATE PROJECT ----------------
+# ---------------- CREATE PROJECT ----------------
 @app.route('/create_project', methods=['GET', 'POST'])
 @login_required
 def create_project():
@@ -270,19 +280,29 @@ def create_project():
         reminder_raw = request.form.get("reminder_time")
         frequency = request.form.get("frequency")
 
-        # Parse deadline
+        # ✅ Parse deadline
         deadline = None
         if deadline_raw:
             try:
                 deadline = datetime.fromisoformat(deadline_raw)
+
+                if not is_weekday(deadline):
+                    flash("Deadline must be Monday to Friday")
+                    return redirect(request.referrer)
+
             except ValueError:
                 deadline = None
 
-        # Parse reminder
+        # ✅ Parse reminder
         reminder_time = None
         if reminder_raw:
             try:
                 reminder_time = datetime.fromisoformat(reminder_raw)
+
+                if not is_weekday(reminder_time):
+                    flash("Reminder must be Monday to Friday")
+                    return redirect(request.referrer)
+
             except ValueError:
                 reminder_time = None
 
