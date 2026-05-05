@@ -178,7 +178,11 @@ def project(id):
 @app.route("/create_task/<int:project_id>", methods=["POST"])
 @login_required
 def create_task(project_id):
+    from models import Task, User
+    from datetime import datetime
+    from flask import request, redirect, url_for
 
+    # ✅ GET FORM DATA
     due_date_raw = request.form.get("due_date")
     reminder_raw = request.form.get("reminder_time")
 
@@ -187,15 +191,15 @@ def create_task(project_id):
     if due_date_raw:
         try:
             due_date = datetime.fromisoformat(due_date_raw)
-        except Exception:
+        except:
             due_date = datetime.strptime(due_date_raw, "%Y-%m-%d")
 
-    # ✅ PARSE REMINDER TIME
+    # ✅ PARSE REMINDER
     reminder_time = None
     if reminder_raw:
         try:
             reminder_time = datetime.fromisoformat(reminder_raw)
-        except Exception:
+        except:
             reminder_time = None
 
     # ✅ CREATE TASK
@@ -213,19 +217,19 @@ def create_task(project_id):
     db.session.add(task)
     db.session.commit()
 
-    # ✅ GET USER (IMPORTANT FIX)
+    # ✅ GET USER
     user = None
     if task.assigned_to:
-        user = db.session.get(User, task.assigned_to)
+        user = User.query.get(task.assigned_to)
 
-    # ✅ SEND EMAIL SAFELY
-    if user:
+    # ✅ SEND EMAIL SAFELY (won’t crash app)
+    if user and user.email:
         try:
             send_assignment_email(user, task.title, task.frequency)
         except Exception as e:
             print("Email failed:", e)
 
-    # ✅ REDIRECT (INSIDE FUNCTION)
+    # ✅ FINAL RETURN (ONLY ONE RETURN)
     return redirect(url_for("project", id=project_id))
 # ---------------- COMPLETE TASK ----------------
 @app.route("/complete_task/<int:task_id>")
